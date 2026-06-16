@@ -1,0 +1,42 @@
+# Reference compose for olefied (pooled, timeout-guarded olefy). On the
+# mailscreen stack this replaces the upstream olefy service at the same address
+# (172.30.0.41:10050) so rspamd's external_services oletools config needs no
+# change. olefied speaks the unmodified olefy wire protocol.
+services:
+  olefy:
+    image: eilandert/olefied:latest
+    container_name: olefy
+    restart: unless-stopped
+    pids_limit: 256
+    mem_limit: 512m
+    stop_grace_period: 5s
+
+    networks:
+      internal_net:
+        ipv4_address: 172.30.0.41
+
+    environment:
+      TZ: Europe/Amsterdam
+      # workers default to CPU count; scan timeout kills+respawns a wedged worker
+      # OLEFIED_WORKERS: "8"
+      # OLEFIED_REQUEST_TIMEOUT: "60"
+      # OLEFIED_MAX_REQUEST_BYTES: "52428800"
+      # shared result cache across replicas (optional): point at valkey
+      # OLEFIED_REDIS_URL: "redis://valkey-general:6379/7"
+      # OLEFIED_CACHE_TTL: "86400"
+
+    # --- hardening ---------------------------------------------------------
+    read_only: true
+    tmpfs:
+      - /tmp:mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    init: true                       # reap any worker that exits on its own
+    # the image already defines a HEALTHCHECK (olefy_ping.sh PING→PONG); no override.
+
+networks:
+  internal_net:
+    external: true
+    name: mailscreen_internal_net
