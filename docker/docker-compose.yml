@@ -9,6 +9,7 @@ services:
     restart: unless-stopped
     pids_limit: 256
     mem_limit: 512m
+    cpus: 2.0                         # cap CPU: a hostile doc that pins olevba can't starve the host
     stop_grace_period: 5s
 
     networks:
@@ -28,11 +29,16 @@ services:
     # --- hardening ---------------------------------------------------------
     read_only: true
     tmpfs:
-      - /tmp:mode=1777
+      # scratch for attachment-on-disk before olevba reads it; sized so a fat
+      # upload can't balloon RAM, noexec/nosuid since nothing here is executed.
+      - /tmp:mode=1777,size=256m,noexec,nosuid,nodev
     cap_drop:
       - ALL
     security_opt:
       - no-new-privileges:true
+      # Docker's default seccomp profile stays ON (container is not --privileged
+      # and we never set seccomp:unconfined). cap_drop ALL means no syscall here
+      # needs an elevated cap.
     init: true                       # reap any worker that exits on its own
     # the image already defines a HEALTHCHECK (olefy_ping.sh PING→PONG); no override.
 
