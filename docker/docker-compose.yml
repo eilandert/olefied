@@ -4,7 +4,7 @@
 # change. olefied speaks the unmodified olefy wire protocol.
 services:
   olefy:
-    image: eilandert/olefied:latest
+    image: eilandert/rspamd-olefy:latest
     container_name: olefy
     restart: unless-stopped
     pids_limit: 256

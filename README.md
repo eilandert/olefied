@@ -47,7 +47,7 @@ repoint it. `PING\n\n` still returns `PONG`.
 docker run -d --name olefied \
   -e OLEFIED_WORKERS=4 \
   -p 10050:10050 \
-  eilandert/olefied
+  eilandert/rspamd-olefy
 ```
 
 Check it's alive:
@@ -118,7 +118,7 @@ replicas** reuse each other's results.
 ```yaml
 services:
   olefied:
-    image: eilandert/olefied
+    image: eilandert/rspamd-olefy
     environment:
       OLEFIED_REDIS_URL: redis://redis:6379/0
     networks: [ internal ]
@@ -220,7 +220,7 @@ docker run -d --name olefied --init \
   --memory 1g --cpus 4 \
   -e OLEFIED_WORKERS=4 \
   -p 10050:10050 \
-  eilandert/olefied
+  eilandert/rspamd-olefy
 ```
 
 Or in a mail stack — internal network, no exposed port:
@@ -228,7 +228,7 @@ Or in a mail stack — internal network, no exposed port:
 ```yaml
 services:
   olefied:
-    image: eilandert/olefied
+    image: eilandert/rspamd-olefy
     init: true
     read_only: true
     tmpfs: [ "/tmp:mode=1777,size=512m" ]
